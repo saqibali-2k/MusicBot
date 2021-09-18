@@ -2822,7 +2822,11 @@ class MusicBot(discord.Client):
         if not self.cache_clear_queued:
             self.cache_clear_queued = True
             await self.on_player_finished_playing(player)
-            subprocess.run(["rm", '-rf', CACHE_FOLDER + "/*"])
+            folder = CACHE_FOLDER
+            for filename in os.listdir(folder):
+                file_path = os.path.join(folder, filename)
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.remove(file_path)
             self.cache_clear_queued = False
             return Response(self.str.get('cmd-clearcache-reply', 'Cache has now been cleared.'))
         
