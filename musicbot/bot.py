@@ -1,4 +1,11 @@
 import asyncio
+import os
+import sys
+import subprocess
+import time
+import shlex
+import shutil
+import random
 import inspect
 import logging
 import math
@@ -54,6 +61,7 @@ intents = discord.Intents.all()
 intents.typing = False
 intents.presences = False
 
+CACHE_FOLDER = 'audio_cache'
 
 class MusicBot(discord.Client):
     def __init__(self, config_file=None, perms_file=None, aliases_file=None):
@@ -78,6 +86,7 @@ class MusicBot(discord.Client):
         self.init_ok = False
         self.cached_app_info = None
         self.last_status = None
+        self.cache_clear_queued = False
 
         self.config = Config(config_file)
 
@@ -93,7 +102,7 @@ class MusicBot(discord.Client):
         self.autoplaylist = load_file(self.config.auto_playlist_file)
 
         self.aiolocks = defaultdict(asyncio.Lock)
-        self.downloader = downloader.Downloader(download_folder="audio_cache")
+        self.downloader = downloader.Downloader(download_folder=CACHE_FOLDER)
 
         log.info("Starting MusicBot {}".format(BOTVERSION))
 
@@ -2807,11 +2816,16 @@ class MusicBot(discord.Client):
 
         log.info("Joining {0.guild.name}/{0.name}".format(author.voice.channel))
 
-        return Response(
-            self.str.get("cmd-summon-reply", "Connected to `{0.name}`").format(
-                author.voice.channel
-            )
-        )
+        return Response(self.str.get('cmd-summon-reply', 'Connected to `{0.name}`').format(author.voice.channel))
+    
+    async def cmd_clearcache(self, player):
+        if not self.cache_clear_queued:
+            self.cache_clear_queued = True
+            await self.on_player_finished_playing(player)
+            subprocess.run(["rm", '-rf', CACHE_FOLDER + "/*"])
+            self.cache_clear_queued = False
+        
+        return Response(self.str.get('cmd-clearcache-reply', 'Cache has now been cleared'))
 
     async def cmd_pause(self, player):
         """
