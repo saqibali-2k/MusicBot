@@ -1,4 +1,11 @@
 import asyncio
+import os
+import sys
+import subprocess
+import time
+import shlex
+import shutil
+import random
 import inspect
 import json
 import logging
@@ -123,7 +130,6 @@ CommandResponse = Union[Response, None]
 
 
 log = logging.getLogger(__name__)
-
 
 class MusicBot(discord.Client):
     def __init__(
