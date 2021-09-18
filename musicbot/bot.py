@@ -2824,8 +2824,9 @@ class MusicBot(discord.Client):
             await self.on_player_finished_playing(player)
             subprocess.run(["rm", '-rf', CACHE_FOLDER + "/*"])
             self.cache_clear_queued = False
+            return Response(self.str.get('cmd-clearcache-reply', 'Cache has now been cleared.'))
         
-        return Response(self.str.get('cmd-clearcache-reply', 'Cache has now been cleared'))
+        return Response(self.str.get('cmd-clearcache-reply', 'Cache clear has been queued.'))        
 
     async def cmd_pause(self, player):
         """
