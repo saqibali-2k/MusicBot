@@ -1358,7 +1358,7 @@ class MusicBot(discord.Client):
         e.set_author(
             name=self.user.name,
             url="https://github.com/Just-Some-Bots/MusicBot",
-            icon_url=self.user.avatar.url if self.user.avatar else None,
+            icon_url= None if not self.user.avatar else self.user.avatar.url,
         )
         return e
 
