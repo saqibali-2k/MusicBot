@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  musicbot:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: musicbot_dev
+    volumes:
+      - .:/musicbot
+    environment:
+      - APP_ENV=docker
+    command: tail -f /dev/null 
